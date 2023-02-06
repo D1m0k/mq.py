@@ -5,14 +5,6 @@ import time
 import pystrix
 
 
-def _noop_handler(agi, args, kwargs, match, path):
-    """
-    Does nothing, causing control to return to Asterisk's dialplan immediately; provided just
-    to demonstrate the fallback handler.
-    """
-    print('its noop')
-
-
 def _demo_handler(agi, args, kwargs, match, path):
     """
     `agi` is the AGI instance used to process events related to the channel, `args` is a
@@ -33,6 +25,14 @@ def _demo_handler(agi, args, kwargs, match, path):
         (dtmf_character, offset) = response  # The key pressed by the user and the playback time
 
     agi.execute(pystrix.agi.core.Hangup())  # Hang up the call
+    
+    
+def _noop_handler(agi, args, kwargs, match, path):
+    """
+    Does nothing, causing control to return to Asterisk's dialplan immediately; provided just
+    to demonstrate the fallback handler.
+    """
+    print('its noop')
 
 
 class FastAGIServer(threading.Thread):
@@ -45,7 +45,7 @@ class FastAGIServer(threading.Thread):
         threading.Thread.__init__(self)
         self.daemon = True
 
-        self._fagi_server = pystrix.agi.FastAGIServer(port=4573)
+        self._fagi_server = pystrix.agi.FastAGIServer(port=4573,interface='0.0.0.0')
 
         self._fagi_server.register_script_handler(re.compile('demo'), _demo_handler)
         self._fagi_server.register_script_handler(None, _noop_handler)
