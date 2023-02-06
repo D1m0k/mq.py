@@ -27,7 +27,8 @@ def _demo_handler(agi, args, kwargs, match, path):
     """
     agi.execute(pystrix.agi.core.Answer())  # Answer the call
     print('its demo')
-    response = agi.execute(pystrix.agi.core.StreamFile('demo-thanks', escape_digits=('1', '2')))  # Play a file; allow DTMF '1' or '2' to interrupt
+    response = agi.execute(pystrix.agi.core.StreamFile('demo-thanks', escape_digits=(
+    '1', '2')))  # Play a file; allow DTMF '1' or '2' to interrupt
     if response:  # Playback was interrupted; if you don't care, you don't need to catch this
         (dtmf_character, offset) = response  # The key pressed by the user and the playback time
 
@@ -44,11 +45,12 @@ class FastAGIServer(threading.Thread):
         threading.Thread.__init__(self)
         self.daemon = True
 
-        self._fagi_server = pystrix.agi.FastAGIServer()
+        self._fagi_server = pystrix.agi.FastAGIServer(port=4573)
 
         self._fagi_server.register_script_handler(re.compile('demo'), _demo_handler)
         self._fagi_server.register_script_handler(None, _noop_handler)
         print(self._fagi_server._script_handlers)
+        print(f'Server is UP on port {self._fagi_server.socket}')
 
     def kill(self):
         self._fagi_server.shutdown()
